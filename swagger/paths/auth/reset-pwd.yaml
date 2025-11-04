@@ -1,0 +1,51 @@
+tags:
+  - Auth
+summary: Reset password
+operationId: resetPassword
+description: 'Reset user password using token from email'
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - token
+          - password
+        properties:
+          token:
+            type: string
+            example: eyJhbGciOi...
+          password:
+            type: string
+            example: newSecret123
+responses:
+  '200':
+    description: Password successfully reset
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Password was successfully reset!
+            data:
+              type: object
+              example: {}
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '404':
+    description: User not found
+    $ref: '../../components/responses/404.yaml'
+  '500':
+    description: Server error
+    $ref: '../../components/responses/500.yaml'

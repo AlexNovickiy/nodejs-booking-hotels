@@ -1,0 +1,25 @@
+description: Bad request
+content:
+  application/json:
+    schema:
+      type: object
+      required:
+        - status
+        - message
+        - data
+      properties:
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: BadRequest
+        data:
+          type: object
+          additionalProperties: true
+          description: Error object produced by http-errors (may contain name, message, details, etc.)
+          example:
+            name: BadRequest
+            message: 'Validation failed'
+            details:
+              - 'name is required'

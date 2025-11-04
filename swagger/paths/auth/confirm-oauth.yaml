@@ -1,0 +1,39 @@
+tags:
+  - Auth
+summary: Confirm Google OAuth (exchange code)
+operationId: confirmGoogleOAuth
+description: 'Exchange OAuth code for session (access token). Query param code expected.'
+security: []
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - code
+        properties:
+          code:
+            type: string
+            example: 4/0AX4XfWjK...
+responses:
+  '200':
+    description: Successfully logged in via Google OAuth
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully logged in via Google OAuth!
+            data:
+              $ref: ../../components/schemas/session.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml

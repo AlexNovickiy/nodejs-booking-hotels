@@ -1,0 +1,11 @@
+tags:
+  - Auth
+summary: Logout user
+operationId: logoutUser
+description: 'Invalidate user session and clear cookies'
+security: []
+responses:
+  '204':
+    description: Logged out (no content)
+  '401':
+    $ref: ../../components/responses/401.yaml
