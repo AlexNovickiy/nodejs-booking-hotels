@@ -1,25 +1,20 @@
-const parseContactType = (contactType) => {
-  const isString = typeof contactType === 'string';
-  if (!isString) return;
-  const isContactType = (type) => ['work', 'home', 'personal'].includes(type);
-
-  if (isContactType(contactType)) return contactType;
+const parseQuery = (q) => {
+  return typeof q === 'string' ? q : undefined;
 };
 
-const parseBoolean = (value) => {
-  if (value === 'true') return true;
-  else if (value === 'false') return false;
-  else return undefined;
+const parseGuests = (guests) => {
+  const num = parseInt(guests);
+  return !Number.isNaN(num) && num > 0 ? num : undefined;
 };
 
 export const parseFilterParams = (query) => {
-  const { contactType, isFavourite } = query;
+  const { q, guests } = query;
 
-  const parsedContactType = parseContactType(contactType);
-  const parsedIsFavourite = parseBoolean(isFavourite);
+  const parsedQuery = parseQuery(q);
+  const parsedGuests = parseGuests(guests);
 
   return {
-    ...(parsedContactType !== undefined && { contactType: parsedContactType }),
-    ...(parsedIsFavourite !== undefined && { isFavourite: parsedIsFavourite }),
+    ...(parsedQuery !== undefined && { q: parsedQuery }),
+    ...(parsedGuests !== undefined && { guests: parsedGuests }),
   };
 };

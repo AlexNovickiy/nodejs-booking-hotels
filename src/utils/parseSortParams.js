@@ -7,13 +7,21 @@ const parseSortOrder = (sortOrder) => {
 };
 
 const parseSortBy = (sortBy) => {
-  const keysOfStudent = ['_id', 'name', 'createdAt', 'updatedAt'];
+  const keysOfHotel = [
+    '_id',
+    'createdAt',
+    'updatedAt',
+    'title',
+    'price',
+    'location',
+    'ratings_summary.average_rating',
+  ];
 
-  if (keysOfStudent.includes(sortBy)) {
+  if (keysOfHotel.includes(sortBy)) {
     return sortBy;
   }
 
-  return '_id';
+  return '_id'; // Сортировка по умолчанию
 };
 
 export const parseSortParams = (query) => {
