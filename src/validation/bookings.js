@@ -8,6 +8,6 @@ export const createBookingSchema = Joi.object({
   guests: Joi.number().min(1).required(),
   name: Joi.string().required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().required(),
+  phone: Joi.string().allow('').optional(),
   specialRequests: Joi.string().allow('').optional(),
 });

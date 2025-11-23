@@ -4,8 +4,8 @@ const bookingSchema = new Schema(
   {
     hotelId: { type: Schema.Types.ObjectId, ref: 'hotels', required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
-    checkIn: { type: Date, required: true },
-    checkOut: { type: Date, required: true },
+    checkIn: { type: String, required: true },
+    checkOut: { type: String, required: true },
     guests: { type: Number, required: true, min: 1 },
     status: {
       type: String,
@@ -18,6 +18,7 @@ const bookingSchema = new Schema(
       id: { type: String, required: true },
       name: { type: String, required: true },
       email: { type: String, required: true },
+      phone: { type: String },
     },
     hotel: {
       id: { type: String, required: true },
