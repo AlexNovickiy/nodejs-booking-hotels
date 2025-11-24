@@ -55,5 +55,5 @@ export const getUserBookings = async (userId) => {
 
 // Получить бронирования для КОНКРЕТНОГО отеля
 export const getHotelBookings = async (hotelId) => {
-  return await BookingsCollection.find({ hotelId }).select('checkIn checkOut');
+  return await BookingsCollection.find({ hotelId }).sort({ checkIn: 1 });
 };

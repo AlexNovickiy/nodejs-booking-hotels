@@ -9,7 +9,7 @@ const reviewSchema = new Schema(
     },
     rating: { type: Number, required: true, min: 1, max: 5 },
     text: { type: String, required: true },
-    date: { type: Date, default: Date.now },
+    date: { type: String, required: true },
     cleanliness_score: { type: Number, required: true, min: 1, max: 5 },
     location_score: { type: Number, required: true, min: 1, max: 5 },
   },

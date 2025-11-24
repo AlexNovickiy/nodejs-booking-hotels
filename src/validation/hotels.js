@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { isValidObjectId } from 'mongoose';
 
 // Схема для создания отеля (картинка обрабатывается отдельно)
 export const createHotelSchema = Joi.object({
@@ -6,6 +7,7 @@ export const createHotelSchema = Joi.object({
   location: Joi.string().min(3).max(50).required(),
   price: Joi.number().min(1).required(),
   description: Joi.string().min(20).max(2000).required(),
+  maxGuests: Joi.number().min(1).required(),
 });
 
 // Схема для обновления отеля (все поля опциональны)
@@ -14,6 +16,7 @@ export const updateHotelSchema = Joi.object({
   location: Joi.string().min(3).max(50),
   price: Joi.number().min(1),
   description: Joi.string().min(20).max(2000),
+  maxGuests: Joi.number().min(1),
 });
 
 // Схема для создания отзыва (из `lib/types.ts` и `ReviewForm.tsx`)
@@ -22,4 +25,10 @@ export const createReviewSchema = Joi.object({
   text: Joi.string().min(10).max(1000).required(),
   cleanliness_score: Joi.number().min(1).max(5).required(),
   location_score: Joi.number().min(1).max(5).required(),
+  hotelId: Joi.string().custom((value, helper) => {
+    if (value && !isValidObjectId(value)) {
+      return helper.message('Hotel id should be a valid mongo id');
+    }
+    return true;
+  }),
 });

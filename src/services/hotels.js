@@ -126,7 +126,7 @@ export const createReview = async (hotelId, userId, reviewData) => {
       name: user.name,
       photo: user.photo,
     },
-    date: new Date(),
+    date: new Date().toISOString().split('T')[0],
   };
 
   // Атомарно добавляем отзыв в массив и пересчитываем summary на стороне MongoDB,
