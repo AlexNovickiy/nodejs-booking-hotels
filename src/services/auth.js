@@ -4,11 +4,7 @@ import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 
 import { UsersCollection } from '../db/models/user.js';
-import {
-  FIFTEEN_MINUTES,
-  TEMPLATES_DIR,
-  THIRTY_DAYS,
-} from '../constants/index.js';
+import { ONE_DAY, TEMPLATES_DIR, THIRTY_DAYS } from '../constants/index.js';
 import { SessionsCollection } from '../db/models/session.js';
 import { SMTP } from '../constants/index.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
@@ -55,7 +51,7 @@ export const loginUser = async (payload) => {
     userId: user._id,
     accessToken,
     refreshToken,
-    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    accessTokenValidUntil: new Date(Date.now() + ONE_DAY),
     refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
   });
 };
@@ -71,7 +67,7 @@ const createSession = () => {
   return {
     accessToken,
     refreshToken,
-    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    accessTokenValidUntil: new Date(Date.now() + ONE_DAY),
     refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
   };
 };

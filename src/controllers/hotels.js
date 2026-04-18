@@ -122,8 +122,8 @@ export const updateHotelController = async (req, res, next) => {
 
   const data = await updateHotel(hotelId, userId, payload);
 
-  res.json({
-    status: 200,
+  res.status(201).json({
+    status: 201,
     message: 'Successfully updated a hotel!',
     data,
   });
