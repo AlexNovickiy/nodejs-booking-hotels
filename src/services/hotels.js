@@ -205,7 +205,7 @@ export const getAllClassifications = async () => {
     hotels.map((h) => ({
       id: h._id.toString(),
       title: h.title,
-      score: h.ratings_summary[scoreField] || 0,
+      score: h.ratings_summary[scoreField].toFixed(1) || 0,
     }));
 
   return {

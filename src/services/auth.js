@@ -180,7 +180,7 @@ export const resetPassword = async (payload) => {
 export const loginOrSignupWithGoogle = async (code) => {
   const loginTicket = await validateCode(code);
   const payload = loginTicket.getPayload();
-  if (!payload) throw createHttpError(401);
+  if (!payload) throw createHttpError(401, 'Invalid Google token');
 
   let user = await UsersCollection.findOne({ email: payload.email });
   if (!user) {
@@ -193,10 +193,14 @@ export const loginOrSignupWithGoogle = async (code) => {
     });
   }
 
+  await SessionsCollection.deleteOne({ userId: user._id });
+
   const newSession = createSession();
 
-  return await SessionsCollection.create({
+  const session = await SessionsCollection.create({
     userId: user._id,
     ...newSession,
   });
+
+  return { session, user };
 };
