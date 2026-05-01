@@ -1,0 +1,26 @@
+tags:
+  - Hotels
+summary: Delete a hotel listing
+operationId: deleteHotel
+description: Permanently deletes a hotel listing. Requires authentication. Only the hotel owner can delete it.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: hotelId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af9
+    description: MongoDB ObjectId of the hotel to delete
+responses:
+  '204':
+    description: Successfully deleted the hotel (no content)
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '403':
+    $ref: ../../components/responses/403.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

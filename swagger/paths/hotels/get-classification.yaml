@@ -1,0 +1,46 @@
+tags:
+  - Hotels
+summary: Get hotel classifications
+operationId: getClassification
+description: Returns top 10 hotels ranked by average rating, cleanliness score, and location score.
+security: []
+responses:
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '200':
+    description: Successfully fetched classifications
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully fetched classifications!
+            data:
+              type: object
+              properties:
+                average:
+                  type: array
+                  description: Top hotels by average rating
+                  items:
+                    $ref: ../../components/schemas/classification-hotel.yaml
+                cleanliness:
+                  type: array
+                  description: Top hotels by cleanliness score
+                  items:
+                    $ref: ../../components/schemas/classification-hotel.yaml
+                location:
+                  type: array
+                  description: Top hotels by location score
+                  items:
+                    $ref: ../../components/schemas/classification-hotel.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

@@ -1,0 +1,35 @@
+type: object
+required:
+  - _id
+  - title
+  - location
+  - price
+  - similarity
+properties:
+  _id:
+    type: string
+    example: 65e4decdd286b30065d54af9
+  title:
+    type: string
+    example: Grand Hotel Vienna
+  location:
+    type: string
+    example: Vienna, Austria
+  price:
+    type: number
+    example: 250
+  description:
+    type: string
+    example: A luxury hotel in the heart of Vienna.
+  imageUrl:
+    type: string
+    example: https://res.cloudinary.com/demo/image/upload/sample.jpg
+  maxGuests:
+    type: integer
+    example: 4
+  ratings_summary:
+    $ref: ./ratings-summary.yaml
+  similarity:
+    type: number
+    description: Cosine similarity score (0–1) used for ranking recommendations
+    example: 0.92

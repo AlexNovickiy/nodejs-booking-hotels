@@ -1,0 +1,15 @@
+type: object
+required:
+  - id
+  - title
+  - score
+properties:
+  id:
+    type: string
+    example: 65e4decdd286b30065d54af9
+  title:
+    type: string
+    example: Grand Hotel Vienna
+  score:
+    type: string
+    example: '4.8'

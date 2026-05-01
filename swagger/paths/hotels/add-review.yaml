@@ -1,0 +1,75 @@
+tags:
+  - Hotels
+summary: Add a review to a hotel
+operationId: addReview
+description: Adds a guest review to a hotel. Automatically recalculates the hotel's ratings summary (average rating, cleanliness, location scores). Requires authentication.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: hotelId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af9
+    description: MongoDB ObjectId of the hotel to review
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - rating
+          - text
+          - cleanliness_score
+          - location_score
+        properties:
+          rating:
+            type: number
+            minimum: 1
+            maximum: 5
+            example: 4
+          text:
+            type: string
+            minLength: 10
+            maxLength: 1000
+            example: Excellent hotel with outstanding service and a perfect location near the city center.
+          cleanliness_score:
+            type: number
+            minimum: 1
+            maximum: 5
+            example: 5
+          location_score:
+            type: number
+            minimum: 1
+            maximum: 5
+            example: 4
+responses:
+  '201':
+    description: Successfully created a review
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully created a review!
+            data:
+              $ref: ../../components/schemas/review.yaml
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

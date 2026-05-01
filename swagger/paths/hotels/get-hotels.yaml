@@ -1,0 +1,97 @@
+tags:
+  - Hotels
+summary: Get list of hotels
+operationId: getHotels
+description: Returns a paginated list of hotels. Supports full-text search by title or location and filtering by guest capacity.
+security: []
+parameters:
+  - in: query
+    name: page
+    schema:
+      type: integer
+      default: 1
+      minimum: 1
+    description: Page number for pagination
+  - in: query
+    name: perPage
+    schema:
+      type: integer
+      default: 10
+      minimum: 1
+    description: Number of hotels per page
+  - in: query
+    name: sortBy
+    schema:
+      type: string
+      default: _id
+      example: price
+    description: Field name to sort results by (e.g. price, title, createdAt)
+  - in: query
+    name: sortOrder
+    schema:
+      type: string
+      enum:
+        - asc
+        - desc
+      default: asc
+    description: Sort direction
+  - in: query
+    name: q
+    schema:
+      type: string
+      example: Vienna
+    description: Full-text search query (matches hotel title or location, case-insensitive)
+  - in: query
+    name: guests
+    schema:
+      type: integer
+      minimum: 1
+      example: 3
+    description: Filter hotels that can accommodate at least this many guests (maxGuests >= guests)
+responses:
+  '200':
+    description: Successfully found hotels
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully found hotels!
+            data:
+              type: object
+              properties:
+                hotels:
+                  type: array
+                  items:
+                    $ref: ../../components/schemas/hotel.yaml
+                page:
+                  type: integer
+                  example: 1
+                perPage:
+                  type: integer
+                  example: 10
+                totalItems:
+                  type: integer
+                  example: 85
+                totalPages:
+                  type: integer
+                  example: 9
+                hasPreviousPage:
+                  type: boolean
+                  example: false
+                hasNextPage:
+                  type: boolean
+                  example: true
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

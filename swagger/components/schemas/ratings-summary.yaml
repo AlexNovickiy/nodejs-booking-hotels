@@ -1,0 +1,14 @@
+type: object
+properties:
+  average_rating:
+    type: number
+    example: 4.5
+  cleanliness_score:
+    type: number
+    example: 4.7
+  location_score:
+    type: number
+    example: 4.8
+  total_reviews:
+    type: integer
+    example: 42

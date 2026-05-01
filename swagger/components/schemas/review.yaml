@@ -1,0 +1,55 @@
+type: object
+required:
+  - _id
+  - userId
+  - user
+  - rating
+  - text
+  - date
+  - cleanliness_score
+  - location_score
+properties:
+  _id:
+    type: string
+    example: 65e4decdd286b30065d54af9
+  userId:
+    type: string
+    example: 65e4decdd286b30065d54af8
+  user:
+    type: object
+    properties:
+      name:
+        type: string
+        example: John Doe
+      photo:
+        type: string
+        example: https://res.cloudinary.com/demo/image/upload/sample.jpg
+  rating:
+    type: number
+    minimum: 1
+    maximum: 5
+    example: 4
+  text:
+    type: string
+    example: Great hotel, very clean and perfectly located in the city center.
+  date:
+    type: string
+    example: '2024-06-15'
+  cleanliness_score:
+    type: number
+    minimum: 1
+    maximum: 5
+    example: 5
+  location_score:
+    type: number
+    minimum: 1
+    maximum: 5
+    example: 4
+  createdAt:
+    type: string
+    format: date-time
+    example: '2024-06-15T10:00:00.000Z'
+  updatedAt:
+    type: string
+    format: date-time
+    example: '2024-06-15T10:00:00.000Z'

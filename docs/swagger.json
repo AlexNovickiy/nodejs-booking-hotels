@@ -2,597 +2,42 @@
   "openapi": "3.1.0",
   "info": {
     "version": "1.0.0",
-    "title": "Contacts app",
+    "title": "HotelBooking API",
     "license": {
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "description": "This is a documentation of contacts app"
+    "description": "REST API for the HotelBooking application — browse hotels, manage listings, make bookings, and get personalised recommendations."
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
-    },
-    {
-      "url": "https://nodejs-hw-mongodb-9wgz.onrender.com"
+      "url": "http://localhost:4000",
+      "description": "Local development server"
     }
   ],
   "tags": [
     {
-      "name": "Contacts",
-      "description": "Operations about contacts."
+      "name": "Auth",
+      "description": "Authentication and session management."
     },
     {
-      "name": "Auth",
-      "description": "Auth operations."
+      "name": "Hotels",
+      "description": "Hotel listings, search, reviews, and classification."
+    },
+    {
+      "name": "Bookings",
+      "description": "Create and manage hotel bookings."
+    },
+    {
+      "name": "Users",
+      "description": "User profile operations."
+    },
+    {
+      "name": "Recommendations",
+      "description": "Personalised hotel recommendations via collaborative filtering."
     }
   ],
   "paths": {
-    "/contacts": {
-      "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Get list of contacts",
-        "operationId": "getContacts",
-        "description": "Get list of contacts with this endpoint",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer"
-            },
-            "example": 1
-          },
-          {
-            "in": "query",
-            "name": "perPage",
-            "schema": {
-              "type": "integer",
-              "example": 10
-            }
-          },
-          {
-            "in": "query",
-            "name": "sortBy",
-            "schema": {
-              "type": "string",
-              "example": "name"
-            },
-            "description": "All contacts's fields can be mentioned. Default value - _id"
-          },
-          {
-            "in": "query",
-            "name": "sortOrder",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "example": "asc"
-            }
-          },
-          {
-            "in": "query",
-            "name": "contactType",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "work",
-                "home",
-                "personal"
-              ],
-              "example": "work"
-            }
-          },
-          {
-            "in": "query",
-            "name": "isFavourite",
-            "schema": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully found contacts!",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully found contacts!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "required": [
-                        "data",
-                        "page",
-                        "perPage",
-                        "totalItems",
-                        "totalPages",
-                        "hasNextPage",
-                        "hasPreviousPage"
-                      ],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/contact"
-                          }
-                        },
-                        "page": {
-                          "type": "number",
-                          "example": 2
-                        },
-                        "perPage": {
-                          "type": "number",
-                          "example": 4
-                        },
-                        "totalItems": {
-                          "type": "number",
-                          "example": 4
-                        },
-                        "totalPages": {
-                          "type": "number",
-                          "example": 4
-                        },
-                        "hasNextPage": {
-                          "type": "boolean",
-                          "example": false
-                        },
-                        "hasPreviousPage": {
-                          "type": "boolean",
-                          "example": true
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Create contact",
-        "operationId": "createContact",
-        "description": "Create a contact with payload",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "phoneNumber",
-                  "contactType"
-                ],
-                "properties": {
-                  "name": {
-                    "description": "Contact's name",
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "phoneNumber": {
-                    "description": "Contact's phone number",
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "email": {
-                    "description": "Contact's email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  },
-                  "isFavourite": {
-                    "description": "Is contact favourite",
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "contactType": {
-                    "description": "Contact's type",
-                    "type": "string",
-                    "enum": [
-                      "work",
-                      "home",
-                      "personal"
-                    ]
-                  },
-                  "photo": {
-                    "description": "Contact's photo",
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Creates a contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 201
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully created a contact!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      }
-    },
-    "/contacts/{contactId}": {
-      "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Get contact by id",
-        "operationId": "getContact",
-        "description": "Get contact by id",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Get contact by id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully found contact with id 65ca67e7ae7f10c88b598384!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Upsert contact",
-        "operationId": "upsertContact",
-        "description": "Upsert a contact with payload",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "phoneNumber",
-                  "contactType"
-                ],
-                "properties": {
-                  "name": {
-                    "description": "Contact's name",
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "phoneNumber": {
-                    "description": "Contact's phone number",
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "email": {
-                    "description": "Contact's email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  },
-                  "isFavorite": {
-                    "description": "Is contact favorite",
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "contactType": {
-                    "description": "Contact's type",
-                    "type": "string",
-                    "enum": [
-                      "work",
-                      "home",
-                      "personal"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Upserts a contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": [
-                        201,
-                        200
-                      ]
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully upserted a contact!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Update contact",
-        "operationId": "updateContact",
-        "description": "Update a contact with payload",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "description": "Contact's name",
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "phoneNumber": {
-                    "description": "Contact's phone number",
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "email": {
-                    "description": "Contact's email",
-                    "type": "string",
-                    "example": "john.doe@example.com"
-                  },
-                  "isFavorite": {
-                    "description": "Is contact favorite",
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "contactType": {
-                    "description": "Contact's type",
-                    "type": "string",
-                    "enum": [
-                      "work",
-                      "home",
-                      "personal"
-                    ]
-                  },
-                  "photo": {
-                    "description": "Contact's photo",
-                    "format": "binary",
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Updated a contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully updated a contact!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Delete contact by id",
-        "operationId": "deleteContact",
-        "description": "Delete contact by id",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "contactId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "65ca67e7ae7f10c88b598384"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted contact by id"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        }
-      }
-    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -1069,74 +514,1091 @@
           }
         }
       }
+    },
+    "/hotels": {
+      "get": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Get list of hotels",
+        "operationId": "getHotels",
+        "description": "Returns a paginated list of hotels. Supports full-text search by title or location and filtering by guest capacity.",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "perPage",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1
+            },
+            "description": "Number of hotels per page"
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "type": "string",
+              "default": "_id",
+              "example": "price"
+            },
+            "description": "Field name to sort results by (e.g. price, title, createdAt)"
+          },
+          {
+            "in": "query",
+            "name": "sortOrder",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "description": "Sort direction"
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "example": "Vienna"
+            },
+            "description": "Full-text search query (matches hotel title or location, case-insensitive)"
+          },
+          {
+            "in": "query",
+            "name": "guests",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 3
+            },
+            "description": "Filter hotels that can accommodate at least this many guests (maxGuests >= guests)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found hotels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully found hotels!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "hotels": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/hotel"
+                          }
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "perPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 85
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 9
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "hasNextPage": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Create a new hotel listing",
+        "operationId": "createHotel",
+        "description": "Creates a new hotel listing. Requires authentication. Image must be uploaded as multipart/form-data.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "location",
+                  "price",
+                  "description",
+                  "maxGuests",
+                  "image"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 100,
+                    "example": "Grand Hotel Vienna"
+                  },
+                  "location": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "Vienna, Austria"
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 1,
+                    "example": 250
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 2000,
+                    "example": "A luxury hotel in the heart of Vienna with stunning views of the Ringstrasse boulevard."
+                  },
+                  "maxGuests": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 4
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Hotel cover image file (JPEG, PNG, WebP)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created a hotel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created a hotel!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/hotel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/hotels/my/listings": {
+      "get": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Get current user's hotel listings",
+        "operationId": "getMyListings",
+        "description": "Returns all hotel listings created by the currently authenticated user, sorted by creation date (newest first).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found user listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully found user listings!"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/hotel"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/hotels/classification": {
+      "get": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Get hotel classifications",
+        "operationId": "getClassification",
+        "description": "Returns top 10 hotels ranked by average rating, cleanliness score, and location score.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched classifications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully fetched classifications!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "average": {
+                          "type": "array",
+                          "description": "Top hotels by average rating",
+                          "items": {
+                            "$ref": "#/components/schemas/classification-hotel"
+                          }
+                        },
+                        "cleanliness": {
+                          "type": "array",
+                          "description": "Top hotels by cleanliness score",
+                          "items": {
+                            "$ref": "#/components/schemas/classification-hotel"
+                          }
+                        },
+                        "location": {
+                          "type": "array",
+                          "description": "Top hotels by location score",
+                          "items": {
+                            "$ref": "#/components/schemas/classification-hotel"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/hotels/{hotelId}": {
+      "get": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Get hotel by ID",
+        "operationId": "getHotelById",
+        "description": "Returns a single hotel with all details including reviews and ratings summary.",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId of the hotel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found hotel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully found hotel with id 65e4decdd286b30065d54af9!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/hotel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Update a hotel listing",
+        "operationId": "updateHotel",
+        "description": "Partially updates a hotel listing. Requires authentication. Only the hotel owner can update it. Image upload is optional.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId of the hotel to update"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 100,
+                    "example": "Grand Hotel Vienna"
+                  },
+                  "location": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "Vienna, Austria"
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 1,
+                    "example": 300
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 2000,
+                    "example": "Newly renovated luxury hotel in the heart of Vienna."
+                  },
+                  "maxGuests": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 6
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New hotel cover image (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully updated the hotel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully updated a hotel!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/hotel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Delete a hotel listing",
+        "operationId": "deleteHotel",
+        "description": "Permanently deletes a hotel listing. Requires authentication. Only the hotel owner can delete it.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId of the hotel to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deleted the hotel (no content)"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/hotels/{hotelId}/reviews": {
+      "post": {
+        "tags": [
+          "Hotels"
+        ],
+        "summary": "Add a review to a hotel",
+        "operationId": "addReview",
+        "description": "Adds a guest review to a hotel. Automatically recalculates the hotel's ratings summary (average rating, cleanliness, location scores). Requires authentication.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId of the hotel to review"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rating",
+                  "text",
+                  "cleanliness_score",
+                  "location_score"
+                ],
+                "properties": {
+                  "rating": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 4
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 1000,
+                    "example": "Excellent hotel with outstanding service and a perfect location near the city center."
+                  },
+                  "cleanliness_score": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 5
+                  },
+                  "location_score": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 4
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created a review",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created a review!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/review"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/bookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Create a new booking",
+        "operationId": "createBooking",
+        "description": "Creates a new hotel booking. Requires authentication. Guest name, email, and contact details are required.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "hotelId",
+                  "checkIn",
+                  "checkOut",
+                  "guests",
+                  "name",
+                  "email"
+                ],
+                "properties": {
+                  "hotelId": {
+                    "type": "string",
+                    "example": "65e4decdd286b30065d54af9",
+                    "description": "MongoDB ObjectId of the hotel to book"
+                  },
+                  "checkIn": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-06-01"
+                  },
+                  "checkOut": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-06-07"
+                  },
+                  "guests": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 2
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+380501234567"
+                  },
+                  "specialRequests": {
+                    "type": "string",
+                    "example": "Late check-in, non-smoking room preferred."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created a booking",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created a booking!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/booking"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/bookings/my-bookings": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Get current user's bookings",
+        "operationId": "getMyBookings",
+        "description": "Returns all bookings made by the currently authenticated user, sorted by check-in date ascending.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found user bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully found user bookings!"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/booking"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/bookings/hotel/{hotelId}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Get bookings for a hotel",
+        "operationId": "getHotelBookings",
+        "description": "Returns all bookings for a specific hotel, sorted by check-in date ascending. Public endpoint — used for availability calendar.",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId of the hotel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found hotel bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully found hotel bookings!"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/booking"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get current user profile",
+        "operationId": "getMe",
+        "description": "Returns the profile of the currently authenticated user. Password is never included in the response.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully fetched user profile!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/recommendations": {
+      "get": {
+        "tags": [
+          "Recommendations"
+        ],
+        "summary": "Get personalized hotel recommendations",
+        "operationId": "getRecommendations",
+        "description": "Returns personalized hotel recommendations for the current user based on collaborative filtering (cosine similarity with other users' booking patterns). Requires authentication.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "topN",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 5,
+              "example": 5
+            },
+            "description": "Number of top recommendations to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched recommendations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully fetched recommendations!"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/recommendation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "schemas": {
-      "contact": {
-        "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "phoneNumber",
-          "email",
-          "isFavorite",
-          "contactType",
-          "userId",
-          "photo"
-        ],
-        "properties": {
-          "_id": {
-            "description": "Contact's id",
-            "type": "string",
-            "example": "65e4decdd286b30065d54af9"
-          },
-          "name": {
-            "description": "Contact's name",
-            "type": "string",
-            "example": "John Doe"
-          },
-          "phoneNumber": {
-            "description": "Contact's phone number",
-            "type": "string",
-            "example": "+1234567890"
-          },
-          "email": {
-            "description": "Contact's email",
-            "type": "string",
-            "example": "john.doe@example.com"
-          },
-          "isFavorite": {
-            "description": "Is contact favorite",
-            "type": "boolean",
-            "example": false
-          },
-          "contactType": {
-            "description": "Contact's type",
-            "type": "string",
-            "enum": [
-              "work",
-              "home",
-              "personal"
-            ]
-          },
-          "userId": {
-            "description": "Contact's user id",
-            "type": "string",
-            "example": "65e4decdd286b30065d54af9"
-          },
-          "photo": {
-            "description": "Link to contact's photo",
-            "type": "string",
-            "example": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
-          }
-        }
+      "Hotel": {
+        "$ref": "#/components/schemas/hotel"
+      },
+      "Booking": {
+        "$ref": "#/components/schemas/booking"
+      },
+      "Review": {
+        "$ref": "#/components/schemas/review"
+      },
+      "User": {
+        "$ref": "#/components/schemas/user"
+      },
+      "RatingsSummary": {
+        "$ref": "#/components/schemas/ratings-summary"
+      },
+      "ClassificationHotel": {
+        "$ref": "#/components/schemas/classification-hotel"
+      },
+      "Recommendation": {
+        "$ref": "#/components/schemas/recommendation"
       },
       "user": {
         "type": "object",
@@ -1180,6 +1642,365 @@
           "accessToken": {
             "type": "string",
             "description": "Access token for authentication"
+          }
+        }
+      },
+      "ratings-summary": {
+        "type": "object",
+        "properties": {
+          "average_rating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "cleanliness_score": {
+            "type": "number",
+            "example": 4.7
+          },
+          "location_score": {
+            "type": "number",
+            "example": 4.8
+          },
+          "total_reviews": {
+            "type": "integer",
+            "example": 42
+          }
+        }
+      },
+      "review": {
+        "type": "object",
+        "required": [
+          "_id",
+          "userId",
+          "user",
+          "rating",
+          "text",
+          "date",
+          "cleanliness_score",
+          "location_score"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af9"
+          },
+          "userId": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af8"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "John Doe"
+              },
+              "photo": {
+                "type": "string",
+                "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+              }
+            }
+          },
+          "rating": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 4
+          },
+          "text": {
+            "type": "string",
+            "example": "Great hotel, very clean and perfectly located in the city center."
+          },
+          "date": {
+            "type": "string",
+            "example": "2024-06-15"
+          },
+          "cleanliness_score": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 5
+          },
+          "location_score": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 4
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-15T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-15T10:00:00.000Z"
+          }
+        }
+      },
+      "hotel": {
+        "type": "object",
+        "required": [
+          "_id",
+          "title",
+          "location",
+          "price",
+          "description",
+          "imageUrl",
+          "ownerId",
+          "maxGuests"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af9"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100,
+            "example": "Grand Hotel Vienna"
+          },
+          "location": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Vienna, Austria"
+          },
+          "price": {
+            "type": "number",
+            "minimum": 1,
+            "example": 250
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 2000,
+            "example": "A luxury hotel in the heart of Vienna with stunning views of the Ringstrasse boulevard."
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+          },
+          "ownerId": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af8"
+          },
+          "maxGuests": {
+            "type": "number",
+            "minimum": 1,
+            "example": 4
+          },
+          "ratings_summary": {
+            "$ref": "#/components/schemas/ratings-summary"
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/review"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        }
+      },
+      "classification-hotel": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "score"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af9"
+          },
+          "title": {
+            "type": "string",
+            "example": "Grand Hotel Vienna"
+          },
+          "score": {
+            "type": "string",
+            "example": "4.8"
+          }
+        }
+      },
+      "booking": {
+        "type": "object",
+        "required": [
+          "_id",
+          "hotelId",
+          "userId",
+          "checkIn",
+          "checkOut",
+          "guests",
+          "status",
+          "user",
+          "hotel"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af9"
+          },
+          "hotelId": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af8"
+          },
+          "userId": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af7"
+          },
+          "checkIn": {
+            "type": "string",
+            "example": "2024-06-01"
+          },
+          "checkOut": {
+            "type": "string",
+            "example": "2024-06-05"
+          },
+          "guests": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 2
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "cancelled"
+            ],
+            "example": "confirmed"
+          },
+          "specialRequests": {
+            "type": "string",
+            "example": "Late check-in please, allergic to feathers."
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "email"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "65e4decdd286b30065d54af7"
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "john.doe@example.com"
+              },
+              "phone": {
+                "type": "string",
+                "example": "+380991234567"
+              }
+            }
+          },
+          "hotel": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "location",
+              "price"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "65e4decdd286b30065d54af8"
+              },
+              "title": {
+                "type": "string",
+                "example": "Grand Hotel Vienna"
+              },
+              "imageUrl": {
+                "type": "string",
+                "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+              },
+              "location": {
+                "type": "string",
+                "example": "Vienna, Austria"
+              },
+              "price": {
+                "type": "number",
+                "example": 250
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        }
+      },
+      "recommendation": {
+        "type": "object",
+        "required": [
+          "_id",
+          "title",
+          "location",
+          "price",
+          "similarity"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65e4decdd286b30065d54af9"
+          },
+          "title": {
+            "type": "string",
+            "example": "Grand Hotel Vienna"
+          },
+          "location": {
+            "type": "string",
+            "example": "Vienna, Austria"
+          },
+          "price": {
+            "type": "number",
+            "example": 250
+          },
+          "description": {
+            "type": "string",
+            "example": "A luxury hotel in the heart of Vienna."
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+          },
+          "maxGuests": {
+            "type": "integer",
+            "example": 4
+          },
+          "ratings_summary": {
+            "$ref": "#/components/schemas/ratings-summary"
+          },
+          "similarity": {
+            "type": "number",
+            "description": "Cosine similarity score (0–1) used for ranking recommendations",
+            "example": 0.92
           }
         }
       }
@@ -1252,6 +2073,38 @@
                       "type": "string",
                       "example": "Access token expired"
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message",
+                "data"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 403
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Forbidden"
+                },
+                "data": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "example": {
+                    "message": "You can only edit your own listings"
                   }
                 }
               }

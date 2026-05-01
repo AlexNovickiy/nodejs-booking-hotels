@@ -1,106 +1,125 @@
-# openapi: 3.1.0
-# info:
-#   version: 1.0.0
-#   title: HotelBooking app
-#   license:
-#     name: Apache 2.0
-#     url: http://www.apache.org/licenses/LICENSE-2.0.html
-#   description: This is a documentation of HotelBooking app
-# tags:
-#   - name: Auth
-#     description: Auth operations.
-#   - name: Hotels
-#     description: Operations about hotels and listings.
-#   - name: Bookings
-#     description: Operations about bookings.
-# servers:
-#   - url: http://localhost:3000
-#   - url: https://nodejs-hw-mongodb-9wgz.onrender.com
-# paths:
-#   # --- AUTH ---
-#   /auth/register:
-#     post:
-#       $ref: ../swagger/paths/auth/register.yaml
-#   /auth/login:
-#     post:
-#       $ref: ../swagger/paths/auth/login.yaml
-#   /auth/logout:
-#     post:
-#       $ref: ../swagger/paths/auth/logout.yaml
-#   /auth/refresh:
-#     post:
-#       $ref: ../swagger/paths/auth/refresh.yaml
-#   /auth/send-reset-email:
-#     post:
-#       $ref: ../swagger/paths/auth/send-reset-email.yaml
-#   /auth/reset-pwd:
-#     post:
-#       $ref: ../swagger/paths/auth/reset-pwd.yaml
-#   /auth/get-oauth-url:
-#     get:
-#       $ref: ../swagger/paths/auth/get-oauth-url.yaml
-#   /auth/confirm-oauth:
-#     post:
-#       $ref: ../swagger/paths/auth/confirm-oauth.yaml
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: HotelBooking API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: REST API for the HotelBooking application — browse hotels, manage listings, make bookings, and get personalised recommendations.
+tags:
+  - name: Auth
+    description: Authentication and session management.
+  - name: Hotels
+    description: Hotel listings, search, reviews, and classification.
+  - name: Bookings
+    description: Create and manage hotel bookings.
+  - name: Users
+    description: User profile operations.
+  - name: Recommendations
+    description: Personalised hotel recommendations via collaborative filtering.
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+paths:
+  # --- AUTH ---
+  /auth/register:
+    post:
+      $ref: ../swagger/paths/auth/register.yaml
+  /auth/login:
+    post:
+      $ref: ../swagger/paths/auth/login.yaml
+  /auth/logout:
+    post:
+      $ref: ../swagger/paths/auth/logout.yaml
+  /auth/refresh:
+    post:
+      $ref: ../swagger/paths/auth/refresh.yaml
+  /auth/send-reset-email:
+    post:
+      $ref: ../swagger/paths/auth/send-reset-email.yaml
+  /auth/reset-pwd:
+    post:
+      $ref: ../swagger/paths/auth/reset-pwd.yaml
+  /auth/get-oauth-url:
+    get:
+      $ref: ../swagger/paths/auth/get-oauth-url.yaml
+  /auth/confirm-oauth:
+    post:
+      $ref: ../swagger/paths/auth/confirm-oauth.yaml
 
-#   # --- HOTELS (Placeholder paths) ---
-#   /hotels:
-#     get:
-#       tags:
-#         - Hotels
-#       summary: Get list of all hotels (public)
-#     post:
-#       tags:
-#         - Hotels
-#       summary: Create new hotel listing (private)
-#   /hotels/my-listings:
-#     get:
-#       tags:
-#         - Hotels
-#       summary: Get listings for current user (private)
-#   /hotels/classification:
-#     get:
-#       tags:
-#         - Hotels
-#       summary: Get hotel classifications (public)
-#   /hotels/{hotelId}:
-#     get:
-#       tags:
-#         - Hotels
-#       summary: Get hotel by ID (public)
-#     patch:
-#       tags:
-#         - Hotels
-#       summary: Update hotel by ID (private, owner only)
-#     delete:
-#       tags:
-#         - Hotels
-#       summary: Delete hotel by ID (private, owner only)
-#   /hotels/{hotelId}/reviews:
-#     post:
-#       tags:
-#         - Hotels
-#       summary: Post a review for a hotel (private)
+  # --- HOTELS ---
+  /hotels:
+    get:
+      $ref: ../swagger/paths/hotels/get-hotels.yaml
+    post:
+      $ref: ../swagger/paths/hotels/create-hotel.yaml
+  /hotels/my/listings:
+    get:
+      $ref: ../swagger/paths/hotels/get-my-listings.yaml
+  /hotels/classification:
+    get:
+      $ref: ../swagger/paths/hotels/get-classification.yaml
+  /hotels/{hotelId}:
+    get:
+      $ref: ../swagger/paths/hotels/get-hotel-by-id.yaml
+    patch:
+      $ref: ../swagger/paths/hotels/update-hotel.yaml
+    delete:
+      $ref: ../swagger/paths/hotels/delete-hotel.yaml
+  /hotels/{hotelId}/reviews:
+    post:
+      $ref: ../swagger/paths/hotels/add-review.yaml
 
-#   # --- BOOKINGS (Placeholder paths) ---
-#   /bookings:
-#     post:
-#       tags:
-#         - Bookings
-#       summary: Create new booking (private)
-#   /bookings/my-bookings:
-#     get:
-#       tags:
-#         - Bookings
-#       summary: Get my bookings (private)
-#   /bookings/hotel/{hotelId}:
-#     get:
-#       tags:
-#         - Bookings
-#       summary: Get bookings for a specific hotel (public)
+  # --- BOOKINGS ---
+  /bookings:
+    post:
+      $ref: ../swagger/paths/bookings/create-booking.yaml
+  /bookings/my-bookings:
+    get:
+      $ref: ../swagger/paths/bookings/get-my-bookings.yaml
+  /bookings/hotel/{hotelId}:
+    get:
+      $ref: ../swagger/paths/bookings/get-hotel-bookings.yaml
 
-# components:
-#   securitySchemes:
-#     bearerAuth:
-#       type: http
-#       scheme: bearer
+  # --- USERS ---
+  /users/me:
+    get:
+      $ref: ../swagger/paths/users/get-me.yaml
+
+  # --- RECOMMENDATIONS ---
+  /recommendations:
+    get:
+      $ref: ../swagger/paths/recommendations/get-recommendations.yaml
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Hotel:
+      $ref: ../swagger/components/schemas/hotel.yaml
+    Booking:
+      $ref: ../swagger/components/schemas/booking.yaml
+    Review:
+      $ref: ../swagger/components/schemas/review.yaml
+    User:
+      $ref: ../swagger/components/schemas/user.yaml
+    RatingsSummary:
+      $ref: ../swagger/components/schemas/ratings-summary.yaml
+    ClassificationHotel:
+      $ref: ../swagger/components/schemas/classification-hotel.yaml
+    Recommendation:
+      $ref: ../swagger/components/schemas/recommendation.yaml
+  responses:
+    400:
+      $ref: ../swagger/components/responses/400.yaml
+    401:
+      $ref: ../swagger/components/responses/401.yaml
+    403:
+      $ref: ../swagger/components/responses/403.yaml
+    404:
+      $ref: ../swagger/components/responses/404.yaml
+    500:
+      $ref: ../swagger/components/responses/500.yaml

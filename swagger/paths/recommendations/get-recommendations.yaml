@@ -1,0 +1,43 @@
+tags:
+  - Recommendations
+summary: Get personalized hotel recommendations
+operationId: getRecommendations
+description: Returns personalized hotel recommendations for the current user based on collaborative filtering (cosine similarity with other users' booking patterns). Requires authentication.
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: topN
+    required: false
+    schema:
+      type: integer
+      minimum: 1
+      default: 5
+      example: 5
+    description: Number of top recommendations to return
+responses:
+  '200':
+    description: Successfully fetched recommendations
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully fetched recommendations!
+            data:
+              type: array
+              items:
+                $ref: ../../components/schemas/recommendation.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

@@ -1,0 +1,79 @@
+tags:
+  - Hotels
+summary: Update a hotel listing
+operationId: updateHotel
+description: Partially updates a hotel listing. Requires authentication. Only the hotel owner can update it. Image upload is optional.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: hotelId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af9
+    description: MongoDB ObjectId of the hotel to update
+requestBody:
+  required: false
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          title:
+            type: string
+            minLength: 5
+            maxLength: 100
+            example: Grand Hotel Vienna
+          location:
+            type: string
+            minLength: 3
+            maxLength: 50
+            example: Vienna, Austria
+          price:
+            type: number
+            minimum: 1
+            example: 300
+          description:
+            type: string
+            minLength: 20
+            maxLength: 2000
+            example: Newly renovated luxury hotel in the heart of Vienna.
+          maxGuests:
+            type: integer
+            minimum: 1
+            example: 6
+          image:
+            type: string
+            format: binary
+            description: New hotel cover image (optional)
+responses:
+  '201':
+    description: Successfully updated the hotel
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully updated a hotel!
+            data:
+              $ref: ../../components/schemas/hotel.yaml
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '403':
+    $ref: ../../components/responses/403.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

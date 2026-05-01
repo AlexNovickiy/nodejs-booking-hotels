@@ -1,0 +1,78 @@
+tags:
+  - Bookings
+summary: Create a new booking
+operationId: createBooking
+description: Creates a new hotel booking. Requires authentication. Guest name, email, and contact details are required.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - hotelId
+          - checkIn
+          - checkOut
+          - guests
+          - name
+          - email
+        properties:
+          hotelId:
+            type: string
+            example: 65e4decdd286b30065d54af9
+            description: MongoDB ObjectId of the hotel to book
+          checkIn:
+            type: string
+            format: date
+            example: '2024-06-01'
+          checkOut:
+            type: string
+            format: date
+            example: '2024-06-07'
+          guests:
+            type: integer
+            minimum: 1
+            example: 2
+          name:
+            type: string
+            example: John Doe
+          email:
+            type: string
+            format: email
+            example: john.doe@example.com
+          phone:
+            type: string
+            example: '+380501234567'
+          specialRequests:
+            type: string
+            example: Late check-in, non-smoking room preferred.
+responses:
+  '201':
+    description: Successfully created a booking
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully created a booking!
+            data:
+              $ref: ../../components/schemas/booking.yaml
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

@@ -1,0 +1,57 @@
+type: object
+required:
+  - _id
+  - title
+  - location
+  - price
+  - description
+  - imageUrl
+  - ownerId
+  - maxGuests
+properties:
+  _id:
+    type: string
+    example: 65e4decdd286b30065d54af9
+  title:
+    type: string
+    minLength: 5
+    maxLength: 100
+    example: Grand Hotel Vienna
+  location:
+    type: string
+    minLength: 3
+    maxLength: 50
+    example: Vienna, Austria
+  price:
+    type: number
+    minimum: 1
+    example: 250
+  description:
+    type: string
+    minLength: 20
+    maxLength: 2000
+    example: A luxury hotel in the heart of Vienna with stunning views of the Ringstrasse boulevard.
+  imageUrl:
+    type: string
+    example: https://res.cloudinary.com/demo/image/upload/sample.jpg
+  ownerId:
+    type: string
+    example: 65e4decdd286b30065d54af8
+  maxGuests:
+    type: number
+    minimum: 1
+    example: 4
+  ratings_summary:
+    $ref: ./ratings-summary.yaml
+  reviews:
+    type: array
+    items:
+      $ref: ./review.yaml
+  createdAt:
+    type: string
+    format: date-time
+    example: '2024-01-01T00:00:00.000Z'
+  updatedAt:
+    type: string
+    format: date-time
+    example: '2024-01-01T00:00:00.000Z'

@@ -1,0 +1,92 @@
+type: object
+required:
+  - _id
+  - hotelId
+  - userId
+  - checkIn
+  - checkOut
+  - guests
+  - status
+  - user
+  - hotel
+properties:
+  _id:
+    type: string
+    example: 65e4decdd286b30065d54af9
+  hotelId:
+    type: string
+    example: 65e4decdd286b30065d54af8
+  userId:
+    type: string
+    example: 65e4decdd286b30065d54af7
+  checkIn:
+    type: string
+    example: '2024-06-01'
+  checkOut:
+    type: string
+    example: '2024-06-05'
+  guests:
+    type: integer
+    minimum: 1
+    example: 2
+  status:
+    type: string
+    enum:
+      - pending
+      - confirmed
+      - cancelled
+    example: confirmed
+  specialRequests:
+    type: string
+    example: Late check-in please, allergic to feathers.
+  user:
+    type: object
+    required:
+      - id
+      - name
+      - email
+    properties:
+      id:
+        type: string
+        example: 65e4decdd286b30065d54af7
+      name:
+        type: string
+        example: John Doe
+      email:
+        type: string
+        format: email
+        example: john.doe@example.com
+      phone:
+        type: string
+        example: '+380991234567'
+  hotel:
+    type: object
+    required:
+      - id
+      - title
+      - location
+      - price
+    properties:
+      id:
+        type: string
+        example: 65e4decdd286b30065d54af8
+      title:
+        type: string
+        example: Grand Hotel Vienna
+      imageUrl:
+        type: string
+        example: https://res.cloudinary.com/demo/image/upload/sample.jpg
+      location:
+        type: string
+        example: Vienna, Austria
+      price:
+        type: number
+        example: 250
+  createdAt:
+    type: string
+    format: date-time
+    example: '2024-01-01T00:00:00.000Z'
+  updatedAt:
+    type: string
+    format: date-time
+    example: '2024-01-01T00:00:00.000Z'

@@ -1,0 +1,74 @@
+tags:
+  - Hotels
+summary: Create a new hotel listing
+operationId: createHotel
+description: Creates a new hotel listing. Requires authentication. Image must be uploaded as multipart/form-data.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - title
+          - location
+          - price
+          - description
+          - maxGuests
+          - image
+        properties:
+          title:
+            type: string
+            minLength: 5
+            maxLength: 100
+            example: Grand Hotel Vienna
+          location:
+            type: string
+            minLength: 3
+            maxLength: 50
+            example: Vienna, Austria
+          price:
+            type: number
+            minimum: 1
+            example: 250
+          description:
+            type: string
+            minLength: 20
+            maxLength: 2000
+            example: A luxury hotel in the heart of Vienna with stunning views of the Ringstrasse boulevard.
+          maxGuests:
+            type: integer
+            minimum: 1
+            example: 4
+          image:
+            type: string
+            format: binary
+            description: Hotel cover image file (JPEG, PNG, WebP)
+responses:
+  '201':
+    description: Successfully created a hotel
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully created a hotel!
+            data:
+              $ref: ../../components/schemas/hotel.yaml
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

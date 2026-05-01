@@ -1,0 +1,40 @@
+tags:
+  - Bookings
+summary: Get bookings for a hotel
+operationId: getHotelBookings
+description: Returns all bookings for a specific hotel, sorted by check-in date ascending. Public endpoint — used for availability calendar.
+security: []
+parameters:
+  - in: path
+    name: hotelId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af9
+    description: MongoDB ObjectId of the hotel
+responses:
+  '200':
+    description: Successfully found hotel bookings
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully found hotel bookings!
+            data:
+              type: array
+              items:
+                $ref: ../../components/schemas/booking.yaml
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

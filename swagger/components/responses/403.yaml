@@ -1,0 +1,21 @@
+description: Forbidden
+content:
+  application/json:
+    schema:
+      type: object
+      required:
+        - status
+        - message
+        - data
+      properties:
+        status:
+          type: integer
+          example: 403
+        message:
+          type: string
+          example: Forbidden
+        data:
+          type: object
+          additionalProperties: true
+          example:
+            message: You can only edit your own listings
