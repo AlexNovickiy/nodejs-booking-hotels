@@ -9,19 +9,20 @@ const bookingSchema = new Schema(
     guests: { type: Number, required: true, min: 1 },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'cancelled'],
+      enum: ['pending', 'confirmed', 'cancelled', 'completed'],
       default: 'confirmed',
     },
     specialRequests: { type: String },
+    stripeSessionId: { type: String },
     // Денормализованные данные для быстрого отображения в "Мои Бронирования"
     user: {
-      id: { type: String, required: true },
+      _id: { type: String, required: true },
       name: { type: String, required: true },
       email: { type: String, required: true },
       phone: { type: String },
     },
     hotel: {
-      id: { type: String, required: true },
+      _id: { type: String, required: true },
       title: { type: String, required: true },
       imageUrl: { type: String },
       location: { type: String, required: true },

@@ -1,14 +1,14 @@
 import { HotelsCollection } from '../db/models/hotel.js';
 import { BookingsCollection } from '../db/models/booking.js';
 
-// ── Математические утилиты ────────────────────────────────────────────────────
+// ── Математичні утиліти
 
 function normalize(value, min, max) {
   if (max === min) return 0;
   return (value - min) / (max - min);
 }
 
-// Косинусное сходство между двумя векторами одинаковой длины
+// Косинусна подібність між двома векторами однакової довжини
 function cosineSimilarity(a, b) {
   let dot = 0;
   let magA = 0;
@@ -24,11 +24,11 @@ function cosineSimilarity(a, b) {
   return dot / (magA * magB);
 }
 
-// ── Построение векторов признаков ────────────────────────────────────────────
+// ── Побудова векторів ознак ────────────────────────────────────────────
 
 /**
- * Вектор отеля: [price_norm, avg_rating_norm, cleanliness_norm, location_norm, capacity_norm]
- * Все компоненты в диапазоне [0, 1].
+ * Вектор готелю: [price_norm, avg_rating_norm, cleanliness_norm, location_norm, capacity_norm]
+ * Усі компоненти в діапазоні [0, 1].
  */
 function buildHotelVector(hotel, priceMin, priceMax, capMin, capMax) {
   return [
@@ -41,16 +41,23 @@ function buildHotelVector(hotel, priceMin, priceMax, capMin, capMax) {
 }
 
 /**
- * Профиль пользователя — взвешенное среднее векторов отелей, которые он бронировал.
- * Вес = оценка пользователя / 5 (если оставил отзыв), иначе 0.6 (нейтральный).
+ * Профіль користувача — зважене середнє векторів готелів, які він бронював.
+ * Вага = оцінка користувача / 5 (якщо залишив відгук), інакше 0,6 (нейтральний).
  */
-function buildUserProfile(bookedHotels, userId, priceMin, priceMax, capMin, capMax) {
+function buildUserProfile(
+  bookedHotels,
+  userId,
+  priceMin,
+  priceMax,
+  capMin,
+  capMax,
+) {
   const DIM = 5;
   const weightedSum = new Array(DIM).fill(0);
   let totalWeight = 0;
 
   for (const hotel of bookedHotels) {
-    // Ищем отзыв этого пользователя в массиве отзывов отеля
+    // Шукаємо відгук цього користувача в масиві відгуків про готель
     const userReview = hotel.reviews?.find(
       (r) => r.userId?.toString() === userId.toString(),
     );
@@ -67,23 +74,25 @@ function buildUserProfile(bookedHotels, userId, priceMin, priceMax, capMin, capM
   return weightedSum.map((v) => v / totalWeight);
 }
 
-// ── Публичная функция ─────────────────────────────────────────────────────────
+// ── Публічна функція
 
 /**
- * Возвращает topN отелей, наиболее похожих на предпочтения пользователя.
- * Если у пользователя нет истории бронирований — возвращает топ по рейтингу (cold-start fallback).
+ * Повертає topN готелів, які найбільше відповідають уподобанням користувача.
+ * Якщо у користувача немає історії бронювань — повертає топ за рейтингом (cold-start fallback).
  */
 export const getRecommendations = async (userId, topN = 5) => {
-  // 1. История бронирований пользователя
+  // 1. Історія бронювань користувача
   const bookings = await BookingsCollection.find({ userId }).lean();
-  const bookedHotelIds = [...new Set(bookings.map((b) => b.hotelId.toString()))];
+  const bookedHotelIds = [
+    ...new Set(bookings.map((b) => b.hotelId.toString())),
+  ];
 
-  // 2. Все отели для построения диапазонов нормализации
+  // 2. Усі готелі для побудови діапазонів нормалізації
   const allHotels = await HotelsCollection.find().lean();
 
   if (allHotels.length === 0) return [];
 
-  // 3. Диапазоны для нормализации
+  // 3. Діапазони для нормалізації
   const prices = allHotels.map((h) => h.price || 0);
   const capacities = allHotels.map((h) => h.maxGuests || 0);
   const priceMin = Math.min(...prices);
@@ -91,7 +100,7 @@ export const getRecommendations = async (userId, topN = 5) => {
   const capMin = Math.min(...capacities);
   const capMax = Math.max(...capacities);
 
-  // ── Cold-start: нет истории → возвращаем топ по рейтингу ──────────────────
+  // ── Cold-start: немає історії - повертаємо топ за рейтингом
   if (bookedHotelIds.length === 0) {
     const topByRating = [...allHotels]
       .sort(
@@ -103,17 +112,17 @@ export const getRecommendations = async (userId, topN = 5) => {
 
     return topByRating.map((h) => ({
       ...h,
-      similarity_score: null, // нет персонализации
+      similarity_score: null, // немає персоналізації
       recommendation_reason: 'top_rated',
     }));
   }
 
-  // 4. Загружаем только те отели, которые пользователь бронировал
+  // 4. Завантажуємо лише ті готелі, які користувач бронював
   const bookedHotels = allHotels.filter((h) =>
     bookedHotelIds.includes(h._id.toString()),
   );
 
-  // 5. Строим профиль пользователя
+  // 5. Створюємо профіль користувача
   const userProfile = buildUserProfile(
     bookedHotels,
     userId,
@@ -125,7 +134,7 @@ export const getRecommendations = async (userId, topN = 5) => {
 
   if (!userProfile) return [];
 
-  // 6. Считаем косинусное сходство для каждого ещё не посещённого отеля
+  // 6. Обчислюємо косинусну подібність для кожного готелю, який ще не відвідували
   const candidates = allHotels.filter(
     (h) => !bookedHotelIds.includes(h._id.toString()),
   );
@@ -133,10 +142,14 @@ export const getRecommendations = async (userId, topN = 5) => {
   const scored = candidates.map((hotel) => {
     const vec = buildHotelVector(hotel, priceMin, priceMax, capMin, capMax);
     const score = cosineSimilarity(userProfile, vec);
-    return { ...hotel, similarity_score: parseFloat(score.toFixed(4)), recommendation_reason: 'personalized' };
+    return {
+      ...hotel,
+      similarity_score: parseFloat(score.toFixed(4)),
+      recommendation_reason: 'personalized',
+    };
   });
 
-  // 7. Сортируем по убыванию сходства и возвращаем topN
+  // 7. Сортуємо за спаданням схожості та повертаємо topN
   scored.sort((a, b) => b.similarity_score - a.similarity_score);
   return scored.slice(0, topN);
 };

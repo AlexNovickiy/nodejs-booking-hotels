@@ -2,6 +2,8 @@ import {
   createBooking,
   getUserBookings,
   getHotelBookings,
+  getUserHotelBooking,
+  deleteUserBooking,
 } from '../services/bookings.js';
 
 // POST /bookings
@@ -37,5 +39,30 @@ export const getHotelBookingsController = async (req, res) => {
     status: 200,
     message: 'Successfully found hotel bookings!',
     data,
+  });
+};
+
+// DELETE /bookings/:bookingId
+export const deleteBookingController = async (req, res) => {
+  const userId = req.user._id;
+  const { bookingId } = req.params;
+  await deleteUserBooking(userId, bookingId);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Booking successfully deleted!',
+  });
+};
+
+// GET /bookings/my-booking/:hotelId
+export const getUserHotelBookingController = async (req, res) => {
+  const userId = req.user._id;
+  const { hotelId } = req.params;
+  const booking = await getUserHotelBooking(userId, hotelId);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully checked user hotel booking!',
+    data: { hasActiveBooking: !!booking, booking: booking ?? null },
   });
 };

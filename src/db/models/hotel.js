@@ -16,7 +16,6 @@ const reviewSchema = new Schema(
   { _id: true, timestamps: true, versionKey: false },
 );
 
-// Схема для отеля
 const hotelSchema = new Schema(
   {
     title: { type: String, required: true },
@@ -31,7 +30,7 @@ const hotelSchema = new Schema(
       location_score: { type: Number, default: 0 },
       total_reviews: { type: Number, default: 0 },
     },
-    reviews: [reviewSchema], // Встраиваем отзывы
+    reviews: [reviewSchema],
     maxGuests: { type: Number, required: true },
   },
   {
@@ -40,7 +39,6 @@ const hotelSchema = new Schema(
   },
 );
 
-// Индекс для поиска
 hotelSchema.index({ title: 'text', location: 'text' });
 
 export const HotelsCollection = model('hotels', hotelSchema);

@@ -110,15 +110,12 @@ export const deleteHotel = async (hotelId, userId) => {
   return await HotelsCollection.findOneAndDelete({ _id: hotelId });
 };
 
-// Добавление отзыва
 export const createReview = async (hotelId, userId, reviewData) => {
-  // Проверяем, что пользователь существует
   const user = await UsersCollection.findById(userId);
   if (!user) {
     throw createHttpError(404, 'User not found');
   }
 
-  // Формируем новый отзыв (без _id: Mongo автоматически добавит _id при сохранении в БД)
   const newReview = {
     ...reviewData,
     userId: user._id,
@@ -129,12 +126,9 @@ export const createReview = async (hotelId, userId, reviewData) => {
     date: new Date().toISOString().split('T')[0],
   };
 
-  // Атомарно добавляем отзыв в массив и пересчитываем summary на стороне MongoDB,
-  // чтобы избежать гонок (чтение->модификация->save). Используем update-pipeline (MongoDB 4.2+).
   const updated = await HotelsCollection.findOneAndUpdate(
     { _id: hotelId },
     [
-      // 1) Добавляем новый отзыв к массиву (защищаемся через $ifNull на случай отсутствия поля)
       {
         $set: {
           reviews: {
@@ -142,7 +136,6 @@ export const createReview = async (hotelId, userId, reviewData) => {
           },
         },
       },
-      // 2) Пересчитываем поля в ratings_summary на основе обновлённого массива reviews
       {
         $set: {
           'ratings_summary.total_reviews': { $size: '$reviews' },
@@ -177,7 +170,6 @@ export const createReview = async (hotelId, userId, reviewData) => {
     throw createHttpError(404, 'Hotel not found');
   }
 
-  // Возвращаем только добавленный отзыв (интерфейс совместим с предыдущей реализацией)
   return updated.reviews[updated.reviews.length - 1];
 };
 

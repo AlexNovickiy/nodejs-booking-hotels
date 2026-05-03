@@ -10,11 +10,20 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { UPLOAD_DIR } from './constants/index.js';
 import { swaggerDocs } from './middlewares/swaggerDocs.js';
+import { ctrlWrapper } from './utils/ctrlWrapper.js';
+import { stripeWebhookController } from './controllers/stripe.js';
 
 const PORT = Number(getEnvVar('PORT', '4000'));
 
 export const setupServer = () => {
   const app = express();
+
+  // Stripe webhook MUST receive raw body — register before express.json()
+  app.post(
+    '/stripe/webhook',
+    express.raw({ type: 'application/json' }),
+    ctrlWrapper(stripeWebhookController),
+  );
 
   app.use(express.json());
   app.use(

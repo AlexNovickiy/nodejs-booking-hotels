@@ -4,6 +4,8 @@ import {
   createBookingController,
   getMyBookingsController,
   getHotelBookingsController,
+  getUserHotelBookingController,
+  deleteBookingController,
 } from '../controllers/bookings.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { createBookingSchema } from '../validation/bookings.js';
@@ -29,5 +31,17 @@ bookingsRouter.post(
 );
 
 bookingsRouter.get('/my-bookings', ctrlWrapper(getMyBookingsController));
+
+bookingsRouter.get(
+  '/my-booking/:hotelId',
+  isValidId('hotelId'),
+  ctrlWrapper(getUserHotelBookingController),
+);
+
+bookingsRouter.delete(
+  '/:bookingId',
+  isValidId('bookingId'),
+  ctrlWrapper(deleteBookingController),
+);
 
 export default bookingsRouter;
