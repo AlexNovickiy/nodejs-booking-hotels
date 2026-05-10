@@ -1,11 +1,13 @@
 openapi: 3.1.0
 info:
-  version: 1.0.0
+  version: 2.0.0
   title: HotelBooking API
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: REST API for the HotelBooking application — browse hotels, manage listings, make bookings, and get personalised recommendations.
+  description: >
+    REST API for the HotelBooking application — browse hotels, manage listings,
+    make bookings with Stripe payments, and get personalised recommendations.
 tags:
   - name: Auth
     description: Authentication and session management.
@@ -13,6 +15,11 @@ tags:
     description: Hotel listings, search, reviews, and classification.
   - name: Bookings
     description: Create and manage hotel bookings.
+  - name: Stripe
+    description: >
+      Stripe payment integration. POST /stripe/create-checkout-session ініціює
+      оплату; після успішного платежу Stripe автоматично створює бронювання
+      через webhook.
   - name: Users
     description: User profile operations.
   - name: Recommendations
@@ -20,6 +27,7 @@ tags:
 servers:
   - url: http://localhost:4000
     description: Local development server
+
 paths:
   # --- AUTH ---
   /auth/register:
@@ -77,9 +85,20 @@ paths:
   /bookings/my-bookings:
     get:
       $ref: ../swagger/paths/bookings/get-my-bookings.yaml
+  /bookings/my-booking/{hotelId}:
+    get:
+      $ref: ../swagger/paths/bookings/get-my-booking.yaml
   /bookings/hotel/{hotelId}:
     get:
       $ref: ../swagger/paths/bookings/get-hotel-bookings.yaml
+  /bookings/{bookingId}:
+    delete:
+      $ref: ../swagger/paths/bookings/delete-booking.yaml
+
+  # --- STRIPE ---
+  /stripe/create-checkout-session:
+    post:
+      $ref: ../swagger/paths/stripe/create-checkout-session.yaml
 
   # --- USERS ---
   /users/me:
@@ -121,5 +140,7 @@ components:
       $ref: ../swagger/components/responses/403.yaml
     404:
       $ref: ../swagger/components/responses/404.yaml
+    409:
+      $ref: ../swagger/components/responses/409.yaml
     500:
       $ref: ../swagger/components/responses/500.yaml

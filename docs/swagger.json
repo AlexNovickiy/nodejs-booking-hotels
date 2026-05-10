@@ -1,13 +1,13 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "title": "HotelBooking API",
     "license": {
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "description": "REST API for the HotelBooking application — browse hotels, manage listings, make bookings, and get personalised recommendations."
+    "description": "REST API for the HotelBooking application — browse hotels, manage listings, make bookings with Stripe payments, and get personalised recommendations.\n"
   },
   "servers": [
     {
@@ -27,6 +27,10 @@
     {
       "name": "Bookings",
       "description": "Create and manage hotel bookings."
+    },
+    {
+      "name": "Stripe",
+      "description": "Stripe payment integration. POST /stripe/create-checkout-session ініціює оплату; після успішного платежу Stripe автоматично створює бронювання через webhook.\n"
     },
     {
       "name": "Users",
@@ -1385,6 +1389,94 @@
         }
       }
     },
+    "/bookings/my-booking/{hotelId}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Check user's active booking for a hotel",
+        "operationId": "getMyBookingForHotel",
+        "description": "Перевіряє чи має поточний авторизований користувач активне бронювання (статус confirmed або pending, дата виїзду >= сьогодні) для конкретного готелю. Використовується на сторінці готелю для відображення кнопки \"Мої бронювання\" замість \"Забронювати\".\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hotelId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af8"
+            },
+            "description": "MongoDB ObjectId готелю"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішна перевірка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully checked user hotel booking!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "hasActiveBooking",
+                        "booking"
+                      ],
+                      "properties": {
+                        "hasActiveBooking": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "true якщо є активне бронювання"
+                        },
+                        "booking": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/booking"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "Обʼєкт бронювання або null якщо немає активного"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
     "/bookings/hotel/{hotelId}": {
       "get": {
         "tags": [
@@ -1440,6 +1532,257 @@
           },
           "400": {
             "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/bookings/{bookingId}": {
+      "delete": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Delete a completed or cancelled booking",
+        "operationId": "deleteBooking",
+        "description": "Видаляє бронювання з історії поточного користувача. Дозволено тільки для бронювань зі статусом completed або cancelled. Спроба видалити активне бронювання (confirmed) повертає 403.\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookingId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65e4decdd286b30065d54af9"
+            },
+            "description": "MongoDB ObjectId бронювання"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Бронювання успішно видалено",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Booking successfully deleted!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "description": "Forbidden — не можна видалити активне бронювання",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Only completed or cancelled bookings can be deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/stripe/create-checkout-session": {
+      "post": {
+        "tags": [
+          "Stripe"
+        ],
+        "summary": "Create Stripe Checkout Session",
+        "operationId": "createCheckoutSession",
+        "description": "Створює Stripe Checkout Session на основі даних бронювання. Сума розраховується автоматично: ціна готелю × кількість ночей. Перед створенням сесії перевіряються дати на конфлікти. У відповіді повертається URL на сторінку оплати Stripe — клієнт має зробити redirect на цей URL. Після успішної оплати Stripe автоматично надсилає webhook і бронювання створюється в базі даних.\n**Флоу:** 1. Фронтенд POST → `/stripe/create-checkout-session` 2. Отримує `data.url` → `window.location.href = data.url` 3. Користувач оплачує на сторінці Stripe 4. Stripe надсилає `checkout.session.completed` → бекенд створює бронювання 5. Stripe робить redirect на `{APP_DOMAIN}/booking-success?session_id=...`\n",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "hotelId",
+                  "checkIn",
+                  "checkOut",
+                  "guests",
+                  "name",
+                  "email"
+                ],
+                "properties": {
+                  "hotelId": {
+                    "type": "string",
+                    "example": "65e4decdd286b30065d54af8",
+                    "description": "MongoDB ObjectId готелю"
+                  },
+                  "checkIn": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2025-06-01"
+                  },
+                  "checkOut": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2025-06-05"
+                  },
+                  "guests": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 2
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "+380501234567"
+                  },
+                  "specialRequests": {
+                    "type": "string",
+                    "example": "Late check-in, non-smoking room preferred."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session створено — redirect на url",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Checkout session created"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "url"
+                      ],
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "format": "uri",
+                          "example": "https://checkout.stripe.com/c/pay/cs_test_a1B2c3...",
+                          "description": "URL сторінки оплати Stripe"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалідні дати або тіло запиту",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid dates: check-out must be after check-in"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "description": "Конфлікт дат бронювання",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "You already have an active booking for this hotel",
+                        "These dates are already booked by another guest"
+                      ],
+                      "example": "These dates are already booked by another guest"
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -1862,11 +2205,13 @@
           },
           "checkIn": {
             "type": "string",
-            "example": "2024-06-01"
+            "format": "date",
+            "example": "2025-06-01"
           },
           "checkOut": {
             "type": "string",
-            "example": "2024-06-05"
+            "format": "date",
+            "example": "2025-06-05"
           },
           "guests": {
             "type": "integer",
@@ -1878,23 +2223,30 @@
             "enum": [
               "pending",
               "confirmed",
-              "cancelled"
+              "cancelled",
+              "completed"
             ],
-            "example": "confirmed"
+            "example": "confirmed",
+            "description": "pending — очікує підтвердження; confirmed — підтверджено та оплачено; cancelled — скасовано; completed — завершено автоматично після дати виїзду.\n"
           },
           "specialRequests": {
             "type": "string",
-            "example": "Late check-in please, allergic to feathers."
+            "example": "Late check-in, non-smoking room preferred."
+          },
+          "stripeSessionId": {
+            "type": "string",
+            "description": "Stripe Checkout Session ID. Заповнюється після успішної оплати через Stripe.",
+            "example": "cs_test_a1B2c3D4e5F6g7H8i9J0"
           },
           "user": {
             "type": "object",
             "required": [
-              "id",
+              "_id",
               "name",
               "email"
             ],
             "properties": {
-              "id": {
+              "_id": {
                 "type": "string",
                 "example": "65e4decdd286b30065d54af7"
               },
@@ -1916,13 +2268,13 @@
           "hotel": {
             "type": "object",
             "required": [
-              "id",
+              "_id",
               "title",
               "location",
               "price"
             ],
             "properties": {
-              "id": {
+              "_id": {
                 "type": "string",
                 "example": "65e4decdd286b30065d54af8"
               },
@@ -1947,12 +2299,12 @@
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2024-01-01T00:00:00.000Z"
+            "example": "2025-01-01T00:00:00.000Z"
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
-            "example": "2024-01-01T00:00:00.000Z"
+            "example": "2025-01-01T00:00:00.000Z"
           }
         }
       },

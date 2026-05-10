@@ -1,0 +1,56 @@
+tags:
+  - Bookings
+summary: Delete a completed or cancelled booking
+operationId: deleteBooking
+description: >
+  Видаляє бронювання з історії поточного користувача.
+  Дозволено тільки для бронювань зі статусом completed або cancelled.
+  Спроба видалити активне бронювання (confirmed) повертає 403.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: bookingId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af9
+    description: MongoDB ObjectId бронювання
+responses:
+  '200':
+    description: Бронювання успішно видалено
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Booking successfully deleted!
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '403':
+    description: Forbidden — не можна видалити активне бронювання
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 403
+            message:
+              type: string
+              example: Only completed or cancelled bookings can be deleted
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

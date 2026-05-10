@@ -1,0 +1,58 @@
+tags:
+  - Bookings
+summary: Check user's active booking for a hotel
+operationId: getMyBookingForHotel
+description: >
+  Перевіряє чи має поточний авторизований користувач активне бронювання
+  (статус confirmed або pending, дата виїзду >= сьогодні) для конкретного готелю.
+  Використовується на сторінці готелю для відображення кнопки "Мої бронювання"
+  замість "Забронювати".
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: hotelId
+    required: true
+    schema:
+      type: string
+      example: 65e4decdd286b30065d54af8
+    description: MongoDB ObjectId готелю
+responses:
+  '200':
+    description: Успішна перевірка
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully checked user hotel booking!
+            data:
+              type: object
+              required:
+                - hasActiveBooking
+                - booking
+              properties:
+                hasActiveBooking:
+                  type: boolean
+                  example: true
+                  description: true якщо є активне бронювання
+                booking:
+                  oneOf:
+                    - $ref: ../../components/schemas/booking.yaml
+                    - type: 'null'
+                  description: Обʼєкт бронювання або null якщо немає активного
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

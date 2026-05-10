@@ -1,0 +1,126 @@
+tags:
+  - Stripe
+summary: Create Stripe Checkout Session
+operationId: createCheckoutSession
+description: >
+  Створює Stripe Checkout Session на основі даних бронювання.
+  Сума розраховується автоматично: ціна готелю × кількість ночей.
+  Перед створенням сесії перевіряються дати на конфлікти.
+  У відповіді повертається URL на сторінку оплати Stripe — клієнт має зробити
+  redirect на цей URL. Після успішної оплати Stripe автоматично надсилає webhook
+  і бронювання створюється в базі даних.
+
+  **Флоу:**
+  1. Фронтенд POST → `/stripe/create-checkout-session`
+  2. Отримує `data.url` → `window.location.href = data.url`
+  3. Користувач оплачує на сторінці Stripe
+  4. Stripe надсилає `checkout.session.completed` → бекенд створює бронювання
+  5. Stripe робить redirect на `{APP_DOMAIN}/booking-success?session_id=...`
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - hotelId
+          - checkIn
+          - checkOut
+          - guests
+          - name
+          - email
+        properties:
+          hotelId:
+            type: string
+            example: 65e4decdd286b30065d54af8
+            description: MongoDB ObjectId готелю
+          checkIn:
+            type: string
+            format: date
+            example: '2025-06-01'
+          checkOut:
+            type: string
+            format: date
+            example: '2025-06-05'
+          guests:
+            type: integer
+            minimum: 1
+            example: 2
+          name:
+            type: string
+            example: John Doe
+          email:
+            type: string
+            format: email
+            example: john.doe@example.com
+          phone:
+            type: string
+            example: '+380501234567'
+          specialRequests:
+            type: string
+            example: 'Late check-in, non-smoking room preferred.'
+responses:
+  '200':
+    description: Checkout session створено — redirect на url
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Checkout session created
+            data:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: https://checkout.stripe.com/c/pay/cs_test_a1B2c3...
+                  description: URL сторінки оплати Stripe
+  '400':
+    description: Невалідні дати або тіло запиту
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: 'Invalid dates: check-out must be after check-in'
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
+  '409':
+    description: Конфлікт дат бронювання
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 409
+            message:
+              type: string
+              enum:
+                - You already have an active booking for this hotel
+                - These dates are already booked by another guest
+              example: These dates are already booked by another guest
+  '500':
+    $ref: ../../components/responses/500.yaml

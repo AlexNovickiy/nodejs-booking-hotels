@@ -21,10 +21,12 @@ properties:
     example: 65e4decdd286b30065d54af7
   checkIn:
     type: string
-    example: '2024-06-01'
+    format: date
+    example: '2025-06-01'
   checkOut:
     type: string
-    example: '2024-06-05'
+    format: date
+    example: '2025-06-05'
   guests:
     type: integer
     minimum: 1
@@ -35,18 +37,28 @@ properties:
       - pending
       - confirmed
       - cancelled
+      - completed
     example: confirmed
+    description: >
+      pending — очікує підтвердження;
+      confirmed — підтверджено та оплачено;
+      cancelled — скасовано;
+      completed — завершено автоматично після дати виїзду.
   specialRequests:
     type: string
-    example: Late check-in please, allergic to feathers.
+    example: 'Late check-in, non-smoking room preferred.'
+  stripeSessionId:
+    type: string
+    description: Stripe Checkout Session ID. Заповнюється після успішної оплати через Stripe.
+    example: cs_test_a1B2c3D4e5F6g7H8i9J0
   user:
     type: object
     required:
-      - id
+      - _id
       - name
       - email
     properties:
-      id:
+      _id:
         type: string
         example: 65e4decdd286b30065d54af7
       name:
@@ -62,12 +74,12 @@ properties:
   hotel:
     type: object
     required:
-      - id
+      - _id
       - title
       - location
       - price
     properties:
-      id:
+      _id:
         type: string
         example: 65e4decdd286b30065d54af8
       title:
@@ -85,8 +97,8 @@ properties:
   createdAt:
     type: string
     format: date-time
-    example: '2024-01-01T00:00:00.000Z'
+    example: '2025-01-01T00:00:00.000Z'
   updatedAt:
     type: string
     format: date-time
-    example: '2024-01-01T00:00:00.000Z'
+    example: '2025-01-01T00:00:00.000Z'
